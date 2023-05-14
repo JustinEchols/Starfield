@@ -51,13 +51,10 @@ win32_main_window_callback(HWND Window, UINT Message, WPARAM wParam, LPARAM lPar
 {
 	LRESULT result = 0;
 	switch (Message) {
-		case WM_QUIT:
-			{
-				GLOBAL_RUNNING = false;
-			} break;
+		case WM_CLOSE:
 		case WM_DESTROY:
 			{
-				PostQuitMessage(0);
+				GLOBAL_RUNNING = false;
 			} break;
 		case WM_SIZE:
 			{
@@ -143,7 +140,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShow
 
 	stars Stars;
 	
-	srand(1993);
+	srand(2023);
 	for (u32 i = 0; i < STAR_COUNT; i++) {
 		Stars.Star[i].x = (((f32)rand() / (f32)RAND_MAX) * 2.0f + -1.0f);
 		Stars.Star[i].y = (((f32)rand() / (f32)RAND_MAX) * 2.0f + -1.0f);
