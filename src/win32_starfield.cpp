@@ -21,17 +21,17 @@ typedef double f64;
 #define internal static
 #define STAR_COUNT 4096
 
-typedef struct
+struct star
 {
 	f32 x, y, z;
-} star;
+};
 
-typedef struct
+struct stars
 {
 	star Star[STAR_COUNT];
-} stars;
+};
 
-typedef struct
+struct win32_back_buffer
 {
 	BITMAPINFO Info;
 	void *memory;
@@ -40,7 +40,7 @@ typedef struct
 	int width;
 	int height;
 
-} win32_back_buffer;
+};
 
 global_variable b32 GLOBAL_RUNNING;
 global_variable win32_back_buffer Win32BackBuffer;
@@ -53,56 +53,56 @@ win32_main_window_callback(HWND Window, UINT Message, WPARAM wParam, LPARAM lPar
 	switch (Message) {
 		case WM_CLOSE:
 		case WM_DESTROY:
-			{
-				GLOBAL_RUNNING = false;
-			} break;
+		{
+			GLOBAL_RUNNING = false;
+		} break;
 		case WM_SIZE:
-			{
-				RECT Rect;
-				GetClientRect(Window, &Rect);
+		{
+			RECT Rect;
+			GetClientRect(Window, &Rect);
 
-				int client_width = Rect.right - Rect.left;
-				int client_height = Rect.bottom - Rect.top;
+			int client_width = Rect.right - Rect.left;
+			int client_height = Rect.bottom - Rect.top;
 
-				Win32BackBuffer.width = client_width;
-				Win32BackBuffer.height = client_height;
-				Win32BackBuffer.stride = Win32BackBuffer.width * Win32BackBuffer.bytes_per_pixel;
+			Win32BackBuffer.width = client_width;
+			Win32BackBuffer.height = client_height;
+			Win32BackBuffer.stride = Win32BackBuffer.width * Win32BackBuffer.bytes_per_pixel;
 
-				Win32BackBuffer.Info.bmiHeader.biSize = sizeof(Win32BackBuffer.Info.bmiHeader);
-				Win32BackBuffer.Info.bmiHeader.biWidth = Win32BackBuffer.width;
-				Win32BackBuffer.Info.bmiHeader.biHeight = Win32BackBuffer.height;
-				Win32BackBuffer.Info.bmiHeader.biPlanes = 1;
-				Win32BackBuffer.Info.bmiHeader.biBitCount = 32;
-				Win32BackBuffer.Info.bmiHeader.biCompression = BI_RGB;
+			Win32BackBuffer.Info.bmiHeader.biSize = sizeof(Win32BackBuffer.Info.bmiHeader);
+			Win32BackBuffer.Info.bmiHeader.biWidth = Win32BackBuffer.width;
+			Win32BackBuffer.Info.bmiHeader.biHeight = Win32BackBuffer.height;
+			Win32BackBuffer.Info.bmiHeader.biPlanes = 1;
+			Win32BackBuffer.Info.bmiHeader.biBitCount = 32;
+			Win32BackBuffer.Info.bmiHeader.biCompression = BI_RGB;
 
-				if (Win32BackBuffer.memory) {
-					VirtualFree(Win32BackBuffer.memory, 0, MEM_RELEASE);
-				}
-
-				int Win32BackBuffersize = Win32BackBuffer.width * Win32BackBuffer.height * Win32BackBuffer.bytes_per_pixel;
-				Win32BackBuffer.memory = VirtualAlloc(0, Win32BackBuffersize, (MEM_COMMIT | MEM_RESERVE), PAGE_READWRITE);
-
-			} break;
-		case WM_PAINT:
-			{
-				PAINTSTRUCT PaintStruct;
-				HDC DeviceContext = BeginPaint(Window, &PaintStruct);
-
-				StretchDIBits(DeviceContext,
-						0, 0, Win32BackBuffer.width, Win32BackBuffer.height,
-						0, 0, Win32BackBuffer.width, Win32BackBuffer.height,
-						Win32BackBuffer.memory,
-						&Win32BackBuffer.Info,
-						DIB_RGB_COLORS,
-						SRCCOPY);
-
-				EndPaint(Window, &PaintStruct);
-
-			} break;
-		default:
-			{
-				result = DefWindowProcA(Window, Message, wParam, lParam);
+			if (Win32BackBuffer.memory) {
+				VirtualFree(Win32BackBuffer.memory, 0, MEM_RELEASE);
 			}
+
+			int Win32BackBuffersize = Win32BackBuffer.width * Win32BackBuffer.height * Win32BackBuffer.bytes_per_pixel;
+			Win32BackBuffer.memory = VirtualAlloc(0, Win32BackBuffersize, (MEM_COMMIT | MEM_RESERVE), PAGE_READWRITE);
+
+		} break;
+		case WM_PAINT:
+		{
+			PAINTSTRUCT PaintStruct;
+			HDC DeviceContext = BeginPaint(Window, &PaintStruct);
+
+			StretchDIBits(DeviceContext,
+					0, 0, Win32BackBuffer.width, Win32BackBuffer.height,
+					0, 0, Win32BackBuffer.width, Win32BackBuffer.height,
+					Win32BackBuffer.memory,
+					&Win32BackBuffer.Info,
+					DIB_RGB_COLORS,
+					SRCCOPY);
+
+			EndPaint(Window, &PaintStruct);
+
+		} break;
+		default:
+		{
+			result = DefWindowProcA(Window, Message, wParam, lParam);
+		}
 	}
 	return(result);
 }
@@ -219,7 +219,6 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShow
 						u32 *star = (u32 *)pixel;
 						*star = 0xFFFFFFFF;
 					}
-
 				}
 
 				// Blit
